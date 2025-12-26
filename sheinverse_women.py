@@ -14,23 +14,23 @@ STATE_FILE = "sheinverse_state.json"
 
 
 def send_telegram_message(text: str) -> None:
-    bot_token = os.getenv("BOT_TOKEN")  # 🔥 From Railway env
-    chat_id = os.getenv("CHAT_ID")      # 🔥 From Railway env   
-    if not bot_token or not chat_id:
-        print("Missing BOT_TOKEN or CHAT_ID env vars!")
-        return
-        
-    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-    payload = {
+        bot_token = os.getenv("BOT_TOKEN")
+        chat_id = os.getenv("CHAT_ID") 
+        if not bot_token or not chat_id:
+            print("Missing BOT_TOKEN or CHAT_ID env vars!")
+            return
+
+        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+        payload = {
         "chat_id": chat_id,
         "text": text,
         "parse_mode": "HTML",
         "disable_web_page_preview": False,
     }
-    try:
-        requests.post(url, json=payload, timeout=5)
-    except Exception as e:
-        print("Telegram error:", e)
+        try:
+            requests.post(url, json=payload, timeout=5)
+        except Exception as e:
+            print("Telegram error:", e)
 
 
 def load_state() -> Dict:
