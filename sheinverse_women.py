@@ -9,7 +9,7 @@ from typing import Dict, Set, List
 BASE_API = "https://www.sheinindia.in/api/category/sverse-5939-37961"
 POLL_INTERVAL_SEC = 10  # tune carefully for speed vs rate-limit
 
-STATE_FILE = "sheinverse_state.json"
+STATE_FILE = "sheinverse_state_v2.json"
 # ==========================
 
 
