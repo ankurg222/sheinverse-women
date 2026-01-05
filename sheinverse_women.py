@@ -7,7 +7,7 @@ from typing import Dict, Set, List
 # ========= CONFIG =========
 
 BASE_API = "https://www.sheinindia.in/api/category/sverse-5939-37961"
-POLL_INTERVAL_SEC = 10  # tune carefully for speed vs rate-limit
+POLL_INTERVAL_SEC = 8  # tune carefully for speed vs rate-limit
 
 STATE_FILE = "sheinverse_state_v2.json"
 # ==========================
@@ -28,7 +28,7 @@ def send_telegram_message(text: str) -> None:
         "disable_web_page_preview": False,
     }
         try:
-            requests.post(url, json=payload, timeout=5)
+            requests.post(url, json=payload, timeout=3)
         except Exception as e:
             print("Telegram error:", e)
 
@@ -63,10 +63,10 @@ def fetch_page(page: int = 0) -> Dict:
     Uses currentPage query param used by the site's pagination.
     """
     params = {
-        "query": ":relevance:genderfilter:Women",
+        "query": ":newn:genderfilter:Women",
         "currentPage": page,
     }
-    r = requests.get(BASE_API, params=params, timeout=5)
+    r = requests.get(BASE_API, params=params, timeout=3)
     r.raise_for_status()
     return r.json()
 
