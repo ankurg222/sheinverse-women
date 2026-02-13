@@ -13,24 +13,24 @@ STATE_FILE = "sheinverse_state_v2.json"
 # ==========================
 
 
-def send_telegram_message(text: str) -> None:
-        bot_token = os.getenv("BOT_TOKEN")
-        chat_id = os.getenv("CHAT_ID") 
-        if not bot_token or not chat_id:
-            print("Missing BOT_TOKEN or CHAT_ID env vars!")
-            return
+def send_telegram_photo(caption: str, photo_url: str) -> None:
+    bot_token = os.getenv("BOT_TOKEN")
+    chat_id = os.getenv("CHAT_ID")
+    if not bot_token or not chat_id:
+        print("Missing BOT_TOKEN or CHAT_ID env vars!")
+        return
 
-        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-        payload = {
+    url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
+    payload = {
         "chat_id": chat_id,
-        "text": text,
+        "photo": photo_url,
+        "caption": caption,
         "parse_mode": "HTML",
-        "disable_web_page_preview": False,
     }
-        try:
-            requests.post(url, json=payload, timeout=3)
-        except Exception as e:
-            print("Telegram error:", e)
+    try:
+        requests.post(url, json=payload, timeout=3)
+    except Exception as e:
+        print("Telegram photo error:", e)
 
 
 def load_state() -> Dict:
@@ -101,20 +101,19 @@ def extract_product_key(prod: Dict) -> str:
     return str(prod.get("code", ""))
 
 
-def product_to_message(prod: Dict, event_type: str = "NEW") -> str:
-    """
-    Build a nice Telegram message for the product.
-    """
+def product_to_message(prod: Dict, event_type: str = "NEW") -> tuple[str, str]:
     price = prod["price"]["displayformattedValue"]
     url_path = prod.get("url", "")
     link = f"https://www.sheinindia.in{url_path}" if url_path.startswith("/") else url_path
 
-    text = (
-        f"<b>{event_type}</b>\t"
-        f"{link}\n"
-        f"<b>••••••••••••••••••••••••••••••••••••{price}</b>"
-    )
-    return text
+    caption = (
+    f"<b>{price}</b> "
+    f'<a href="{link}">Open</a>')
+
+    images = prod.get("images") or []
+    photo_url = images[0]["url"] if images else None
+
+    return caption, photo_url
 
 
 def summary_alert_message(current_total: int, new_count: int) -> str:
@@ -148,8 +147,8 @@ def main_loop():
         # 🔥 SUMMARY ALERT - when totalResults increases
         if current_total_results > last_total_results:
             new_count = current_total_results - last_total_results
-            summary_msg = summary_alert_message(current_total_results, new_count)
-            send_telegram_message(summary_msg)
+            #summary_msg = summary_alert_message(current_total_results, new_count)
+            #send_telegram_message(summary_msg)
             print(f"📊 SUMMARY: {last_total_results} → {current_total_results} (+{new_count})")
             last_total_results = current_total_results
 
@@ -164,8 +163,11 @@ def main_loop():
             # NEW product (never seen before)
             if key not in seen_products:
                 seen_products[key] = {"first_seen": time.time(), "last_seen": time.time()}
-                msg = product_to_message(prod, event_type="NEW")
-                send_telegram_message(msg)
+                caption, photo_url = product_to_message(prod, event_type="NEW")
+                if photo_url:
+                    send_telegram_photo(caption, photo_url)
+                else:
+                    send_telegram_message(caption)
                 print(f"NEW product: {key}")
 
         # Update seen_products timestamps (your existing logic)
