@@ -66,7 +66,25 @@ def fetch_page(page: int = 0) -> Dict:
         "query": ":newn:genderfilter:Women",
         "currentPage": page,
     }
-    r = requests.get(BASE_API, params=params, timeout=3)
+
+    headers = {
+    "Host": "www.sheinindia.in",
+    "User-Agent": "Mozilla/5.0 (Linux; Android 12; GM1911 Build/SKQ1.211113.001) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.80 Mobile Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Accept-Language": "en-US,en;q=0.9",
+    "DNT": "1",
+    "Upgrade-Insecure-Requests": "1",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-User": "?1",
+    "Sec-Fetch-Dest": "document",
+    "sec-ch-ua": '"Not:A-Brand";v="99", "Android WebView";v="145", "Chromium";v="145"',
+    "sec-ch-ua-mobile": "?1",
+    "sec-ch-ua-platform": '"Android"',
+    "X-Requested-With": "mark.via.gp"
+    }
+    r = requests.get(BASE_API, params=params, headers=headers ,timeout=5)
     r.raise_for_status()
     return r.json()
 
